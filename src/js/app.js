@@ -1,68 +1,70 @@
 App = {
-  web3Provider: null,
-  contracts: {},
+    web3Provider: null,
+    contracts: {},
 
-  init: function() {
-    // Load pets.
-    $.getJSON('../pets.json', function(data) {
-      var petsRow = $('#petsRow');
-      var petTemplate = $('#petTemplate');
+    init: function () {
+        // Initialization
+        return App.initWeb3();
+    },
 
-      for (i = 0; i < data.length; i ++) {
-        petTemplate.find('.panel-title').text(data[i].name);
-        petTemplate.find('img').attr('src', data[i].picture);
-        petTemplate.find('.pet-breed').text(data[i].breed);
-        petTemplate.find('.pet-age').text(data[i].age);
-        petTemplate.find('.pet-location').text(data[i].location);
-        petTemplate.find('.btn-adopt').attr('data-id', data[i].id);
+    initWeb3: function () {
+        // Is there an injected web3 instance?
+        if (typeof web3 !== 'undefined') {
+            App.web3Provider = web3.currentProvider;
+        } else {
+            // If no injected web3 instance is detected, fall back to Ganache
+            App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
+        }
+        web3 = new Web3(App.web3Provider);
 
-        petsRow.append(petTemplate.html());
-      }
-    });
+        return App.initContract();
+    },
 
-    return App.initWeb3();
-  },
+    initContract: function () {
+        $.getJSON('Echo.json', function (data) {
+            // Get the necessary contract artifact file and instantiate it with truffle-contract
+            const EchoArtifact = data;
+            App.contracts.Echo = TruffleContract(EchoArtifact);
 
-  initWeb3: function() {
-    /*
-     * Replace me...
-     */
+            // Set the provider for our contract
+            App.contracts.Echo.setProvider(App.web3Provider);
 
-    return App.initContract();
-  },
+            // Use our contract to retrieve and mark the adopted pets
+            App.bindEvents();
+        });
+    },
 
-  initContract: function() {
-    /*
-     * Replace me...
-     */
+    bindEvents: () => {
+        let button = document.querySelector("#send-button");
+        console.log(button);
+        button.addEventListener("click", () =>{
+            let textInput = $("#send-button");
+            const text = textInput.val();
+            console.log("CLICK", "A" + text);
+            if (text !== "")
+                App.echo(text);
+        });
 
-    return App.bindEvents();
-  },
+    },
 
-  bindEvents: function() {
-    $(document).on('click', '.btn-adopt', App.handleAdopt);
-  },
+    echo: function (text) {
+        let echoInstance;
+        App.contracts.Echo.deployed().then(function (instance) {
+            echoInstance = instance;
+            return echoInstance.echo.call(text);
+        }).then(function (text) {
+            console.log("RESPONSE FROM CONTRACT:", text);
+            const child = $(`<div class='row'>${text}</div>`);
+            document.querySelector("history-board").appendChild(child);
 
-  markAdopted: function(adopters, account) {
-    /*
-     * Replace me...
-     */
-  },
-
-  handleAdopt: function(event) {
-    event.preventDefault();
-
-    var petId = parseInt($(event.target).data('id'));
-
-    /*
-     * Replace me...
-     */
-  }
-
+        }).catch(function (err) {
+            console.log(err.message);
+        });
+    },
 };
 
-$(function() {
-  $(window).load(function() {
-    App.init();
-  });
+$(function () {
+    $(window).load(function () {
+        App.init();
+    });
 });
