@@ -2,7 +2,6 @@ import React from 'react';
 import Flux from "@4geeksacademy/react-flux-dash";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Home from "./views/Home.jsx";
-import Product from "./views/Product.jsx";
 
 export default class Layout extends Flux.View {
     render() {

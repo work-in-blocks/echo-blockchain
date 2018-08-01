@@ -4,23 +4,74 @@
     "react"
   ],
   "env": {
-    "browser": true,
+    "browser": true
   },
   "rules": {
-    "strict":0,
+    "strict": 0,
     "no-unused-vars": 0,
-    "no-console": 1,
-    "semi": ["error", "always"],
+    "semi": [
+      "off",
+      "always"
+    ],
+    "no-undef": [
+      "off",
+      "always"
+    ],
+    "no-extra-semi": [
+      "off",
+      "always"
+    ],
+    "no-empty": [
+      "off",
+      "always"
+    ],
+    "no-constant-condition": [
+      "off",
+      "always"
+    ],
+
+    "no-global-assign": [
+      "off",
+      "always"
+    ],
+
+    "no-console": [
+      "off",
+      "always"
+    ],
+    "no-redeclare": [
+      "off",
+      "always"
+    ],
+    "no-cond-assign": [
+      "off",
+      "always"
+    ],
+
+
+
     "allowImportExportEverywhere": false,
-    "comma-dangle": [1, { //when to use the last comma
+    "comma-dangle": [
+      1,
+      {
+        //when to use the last comma
         "arrays": "never",
         "objects": "never",
         "imports": "never",
         "exports": "never",
-        "functions": "ignore",
-    }],
-    "react/jsx-indent": ["error", 4],
-    "react/prop-types": [2]
+        "functions": "ignore"
+      }
+    ],
+    "react/jsx-indent": [
+      "error",
+      4
+    ],
+    "react/prop-types": [
+      2
+    ]
   },
-  "extends": ["eslint:recommended", "plugin:react/recommended"]
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ]
 }
