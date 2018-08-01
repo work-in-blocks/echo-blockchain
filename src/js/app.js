@@ -41,8 +41,7 @@ App = {
             let textInput = $("#send-button");
             const text = textInput.val();
             console.log("CLICK", "A" + text);
-            if (text !== "")
-                App.echo(text);
+            App.echo("TEST A");
         });
 
     },
@@ -53,9 +52,21 @@ App = {
             echoInstance = instance;
             return echoInstance.echo.call(text);
         }).then(function (text) {
-            console.log("RESPONSE FROM CONTRACT:", text);
-            const child = $(`<div class='row'>${text}</div>`);
-            document.querySelector("history-board").appendChild(child);
+            console.log("RESPONSE FROM CONTRACT.ECHO:", text);
+            // const child = $(`<div class='row'>${text}</div>`);
+            // document.querySelector("history-board").appendChild(child);
+
+        }).catch(function (err) {
+            console.log(err.message);
+        });
+
+        App.contracts.Echo.deployed().then(function (instance) {
+            echoInstance = instance;
+            return echoInstance.fullHistory.call();
+        }).then(function (text) {
+            console.log("RESPONSE FROM CONTRACT.FULLHISTORY:", text);
+            // const child = $(`<div class='row'>${text}</div>`);
+            // document.querySelector("history-board").appendChild(child);
 
         }).catch(function (err) {
             console.log(err.message);

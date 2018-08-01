@@ -1,33 +1,33 @@
 pragma solidity ^0.4.24;
 
-//import "./Serialize.sol";
 import "./strings.sol";
 
-contract Echo{
+contract Echo {
     address public owner;
-//    string[] private history;
-    uint private word_count;
+    string[] private history;
     using strings for *;
     string public s;
-
-    modifier onlyOwner() {
-        if (msg.sender == owner) _;
-    }
+    string public lastMessage;
+    uint public messageCount;
 
     constructor() public {
         owner = msg.sender;
+        lastMessage = "None yet";
     }
 
-    function echo(string text) onlyOwner public returns (string, uint) {
-//        history[wordcount++] = text;
-        word_count = word_count + 1;
-        string memory prefix = "From the Blockchain:";
-        string memory response = prefix.toSlice().concat(text.toSlice());
-        return (response, word_count);
+    function echo(string text) public returns (string) {
+        history.push(text);
+        lastMessage = text;
+        messageCount++;
+        return text;
     }
-//
-//    function fullHistory() public view returns (bytes){
-//        return stringArrayToBytes(history);
-//    }
+    //
+    function fullHistory() public view returns (string){
+        string memory _history = "";
+        for (uint i = 0; i < history.length; i++) {
+            _history = _history.toSlice().concat("||".toSlice()).toSlice().concat(history[i].toSlice());
+        }
+        return _history;
+    }
 
 }
