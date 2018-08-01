@@ -21,7 +21,7 @@ App = {
     },
 
     initContract: function () {
-        $.getJSON('Echo.json', function (data) {
+        fetch('Echo.json').then(function (data) {
             // Get the necessary contract artifact file and instantiate it with truffle-contract
             const EchoArtifact = data;
             App.contracts.Echo = TruffleContract(EchoArtifact);
@@ -32,15 +32,23 @@ App = {
             // Use our contract to retrieve and mark the adopted pets
             App.bindEvents();
         });
+
+        fetch('Sum.json').then(function (data) {
+            // Get the necessary contract artifact file and instantiate it with truffle-contract
+            App.contracts.Sum = TruffleContract(data);
+
+            // Set the provider for our contract
+            App.contracts.Sum.setProvider(App.web3Provider);
+
+            // Use our contract to retrieve and mark the adopted pets
+            App.bindEvents();
+        });
     },
 
     bindEvents: () => {
         let button = document.querySelector("#send-button");
         console.log(button);
-        button.addEventListener("click", () =>{
-            let textInput = $("#send-button");
-            const text = textInput.val();
-            console.log("CLICK", "A" + text);
+        button.addEventListener("click", () => {
             if (text !== "")
                 App.echo(text);
         });
@@ -48,8 +56,23 @@ App = {
     },
 
     echo: function (text) {
+        App.contracts.Sum.deployed().then(function (instance) {
+            console.log(instance);
+            return instance.sum.call(1, 2);
+        }).then(function (text) {
+            console.log("RESPONSE FROM CONTRACT:", text);
+            const child = $(`<div class='row'>${text}</div>`);
+            document.querySelector("history-board").appendChild(child);
+
+        }).catch(function (err) {
+            console.log(err.message);
+        });
+
+
+
         let echoInstance;
         App.contracts.Echo.deployed().then(function (instance) {
+            console.log(instance);
             echoInstance = instance;
             return echoInstance.echo.call(text);
         }).then(function (text) {
@@ -63,8 +86,6 @@ App = {
     },
 };
 
-$(function () {
-    $(window).load(function () {
-        App.init();
-    });
-});
+window.onload = function () {
+    App.init();
+};
