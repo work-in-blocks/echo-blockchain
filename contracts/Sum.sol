@@ -4,7 +4,7 @@ contract Sum{
     constructor() public {
     }
 
-    function sum(uint first, uint second) public returns (uint) {
+    function sum(uint first, uint second) public view returns (uint) {
         return (first + second);
     }
 }

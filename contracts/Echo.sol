@@ -19,7 +19,7 @@ contract Echo{
         lastMessage = "None yet";
     }
 
-    function echo(string text) public returns (string) {
+    function echo(string text) public payable returns (string) {
         history.push(text);
         lastMessage = text;
         messageCount++;
@@ -33,5 +33,4 @@ contract Echo{
         }
         return _history;
     }
-
 }

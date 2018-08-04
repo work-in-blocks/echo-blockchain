@@ -5,7 +5,6 @@ import Web3 from 'web3';
 import TruffleContract from 'truffle-contract';
 import Echo from '../../contracts/Echo.json';
 
-console.log("LOAD", web3);
 export default class Home extends Flux.View {
 
     constructor() {
@@ -17,13 +16,10 @@ export default class Home extends Flux.View {
             web3: null,
             contracts: {}
         };
-        console.log("CONSTRUCTOR", web3);
         // this.handleUsernameChange = this.handleUsernameChange.bind(this);
     }
 
     componentDidMount() {
-        console.log("CDM", web3);
-        console.log()
         let web3Provider;
         if (typeof web3 !== 'undefined') {
             web3Provider = web3.currentProvider;
@@ -32,9 +28,6 @@ export default class Home extends Flux.View {
             web3Provider = new Web3.providers.HttpProvider('http://localhost:8545');
         }
         web3 = new Web3(web3Provider);
-        console.log("WEB3", web3);
-        console.log("TRUFFLE", TruffleContract);
-        console.log("ECHO", Echo);
         const EchoArtifact = Echo;
         this.state.contracts.Echo = TruffleContract(EchoArtifact);
 
@@ -46,6 +39,7 @@ export default class Home extends Flux.View {
     }
 
     getFullHistory() {
+        console.log("METAMASK2");
         let echoInstance;
         const that = this;
         this.state.contracts.Echo.deployed().then(function (instance) {
@@ -53,6 +47,7 @@ export default class Home extends Flux.View {
             return echoInstance.fullHistory.call();
         }).then(function (text) {
             console.log("RESPONSE FROM CONTRACT:", text);
+            that.setState({msgs: text.split("||")});
         }).catch(function (err) {
             console.log(err);
         });
@@ -61,27 +56,38 @@ export default class Home extends Flux.View {
     echo() {
         let echoInstance;
         const that = this;
-        this.state.contracts.Echo.deployed().then(function (instance) {
-            echoInstance = instance;
-            const msg = `${that.state.username}: ${that.state.text}`;
-            return echoInstance.echo.call(msg);
-        }).then(function (text) {
-            console.log("RESPONSE FROM CONTRACT:", text);
-            that.state.msgs.push(text);
-            that.setState({msgs: that.state.msgs});
-            that.getFullHistory();
-        }).catch(function (err) {
-            console.log(err.message);
+
+        web3.eth.getAccounts(function (error, accounts) {
+            if ("GET ACCOUNTS ERRORL", error) {
+                console.log(error);
+            }
+
+            const account = accounts[0];
+            that.state.contracts.Echo.deployed().then(function (instance) {
+                echoInstance = instance;
+                const msg = `${that.state.username}: ${that.state.text}`;
+                return echoInstance.echo(msg, {from: account});
+            }).then(function (text) {
+                console.log("METAMASK1");
+                that.getFullHistory();
+            }).catch(function (err) {
+                console.log("ECHO ERROR:", err.message);
+            });
         });
     }
 
     render() {
+        const msgHTML = this.state.msgs.map((msg, i) => {
+            return <li key={i}>
+                {msg}
+            </li>
+        });
+
         return (
             <div className="text-center mt-5">
                 <h1>My first DAPP</h1>
-
                 <ul>
-                    <li>Test</li>
+                    {msgHTML}
                 </ul>
                 <br/>
                 <p>

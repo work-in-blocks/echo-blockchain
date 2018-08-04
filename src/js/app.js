@@ -69,7 +69,6 @@ App = {
         });
 
 
-
         let echoInstance;
         App.contracts.Echo.deployed().then(function (instance) {
             console.log(instance);
